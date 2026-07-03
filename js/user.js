@@ -1,6 +1,6 @@
 import { supabase } from "./supabase.js";
 import { requireAuth, signOut } from "./auth.js";
-import { renderNavChart, formatMoney, formatNav, formatPct } from "./common.js";
+import { renderNavChart, formatMoney, formatNav, formatPct, aggregatePositions, formatPnl } from "./common.js";
 
 const user = await requireAuth();
 if (!user) throw new Error("unauthorized");
@@ -27,6 +27,7 @@ async function loadAll() {
   renderChart();
   renderNavTable();
   await renderTransactions();
+  await renderPnlDetails();
 }
 
 function renderLatest() {
@@ -96,12 +97,14 @@ async function renderTransactions() {
   for (const date of Object.keys(groups).sort((a, b) => b.localeCompare(a))) {
     const block = document.createElement("div");
     block.className = "tx-group";
-    let rows = groups[date].map((t) => `
+    let rows = groups[date].map((t) => {
+      return `
       <tr>
         <td>${t.stock_code}</td><td>${t.stock_name}</td>
         <td>${t.buy_price ?? "—"}</td><td>${t.buy_quantity ?? "—"}</td>
         <td>${t.sell_price ?? "—"}</td><td>${t.sell_quantity ?? "—"}</td>
-      </tr>`).join("");
+      </tr>`;
+    }).join("");
     block.innerHTML = `
       <h3 class="tx-date">${date}</h3>
       <table class="data-table">
@@ -110,6 +113,34 @@ async function renderTransactions() {
       </table>`;
     wrap.appendChild(block);
   }
+}
+
+// 盈亏详情：按股票聚合
+async function renderPnlDetails() {
+  const { data } = await supabase.from("transactions").select("*");
+  const positions = aggregatePositions(data || []);
+  const wrap = document.getElementById("pnlDetails");
+  if (!wrap) return;
+  const traded = positions.filter((p) => p.sell_qty > 0 && p.buy_qty > 0);
+  if (traded.length === 0) {
+    wrap.innerHTML = `<p class="muted">暂无已卖出的股票</p>`;
+    return;
+  }
+  let rows = traded.map((p) => {
+    const fmt = formatPnl(p.pnl);
+    return `
+      <tr>
+        <td>${p.stock_code}</td><td>${p.stock_name}</td>
+        <td>${p.buy_qty}</td><td>${p.sell_qty}</td>
+        <td>${p.status}</td>
+        <td class="${fmt.cls}">${fmt.text}</td>
+      </tr>`;
+  }).join("");
+  wrap.innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>股票代码</th><th>名称</th><th>买入总量</th><th>卖出总量</th><th>状态</th><th>盈亏</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
 }
 
 document.querySelectorAll(".range-btn").forEach((btn) => {
