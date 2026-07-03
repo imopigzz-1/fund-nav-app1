@@ -1,7 +1,7 @@
 import { supabase } from "./supabase.js";
 import { requireAuth, signOut } from "./auth.js";
 import { lookupStockName } from "./stocks.js";
-import { renderNavChart, formatMoney, formatNav, todayStr } from "./common.js";
+import { renderNavChart, formatMoney, formatNav, todayStr, aggregatePositions, formatPnl } from "./common.js";
 
 const user = await requireAuth("manager");
 if (!user) throw new Error("unauthorized");
@@ -131,6 +131,7 @@ async function loadTransactions(date) {
       if (!confirm("确认删除该条操作？")) return;
       await supabase.from("transactions").delete().eq("id", btn.dataset.id);
       await loadTransactions(navDateEl.value);
+      await loadPnlDetails();
     });
   });
 }
@@ -184,6 +185,7 @@ document.getElementById("addTxBtn").addEventListener("click", async () => {
     document.getElementById(id).value = "";
   });
   await loadTransactions(date);
+  await loadPnlDetails();
 });
 
 // ---------- 曲线图 ----------
@@ -206,6 +208,34 @@ document.querySelectorAll(".range-btn").forEach((btn) => {
 async function refreshAll() {
   await loadDayData(navDateEl.value);
   await loadChart();
+  await loadPnlDetails();
+}
+
+// ---------- 盈亏详情（按股票聚合）----------
+async function loadPnlDetails() {
+  const { data } = await supabase.from("transactions").select("*");
+  const positions = aggregatePositions(data || []);
+  const body = document.getElementById("pnlTableBody");
+  if (!body) return;
+  body.innerHTML = "";
+  // 只显示有卖出的股票（有买有卖才算盈亏）
+  const traded = positions.filter((p) => p.sell_qty > 0 && p.buy_qty > 0);
+  if (traded.length === 0) {
+    body.innerHTML = `<tr><td colspan="6" class="empty-row">暂无已卖出的股票</td></tr>`;
+    return;
+  }
+  for (const p of traded) {
+    const fmt = formatPnl(p.pnl);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${p.stock_code}</td>
+      <td>${p.stock_name}</td>
+      <td>${p.buy_qty}</td>
+      <td>${p.sell_qty}</td>
+      <td>${p.status}</td>
+      <td class="${fmt.cls}">${fmt.text}</td>`;
+    body.appendChild(tr);
+  }
 }
 
 loadConfig();
