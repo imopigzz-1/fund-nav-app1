@@ -3,7 +3,7 @@
 // 获取方式：Supabase Dashboard → Project Settings → API
 // ============================================================
 
-export const SUPABASE_URL = "https://bwebfsanqmeuybihouzu.supabase.co/rest/v1/";
+export const SUPABASE_URL = "https://bwebfsanqmeuybihouzu.supabase.co";
 export const SUPABASE_ANON_KEY = "sb_publishable_kGjlU3NqDXAnRoxoB2hDNQ_-1Xj2hVD";
 
 // 注意：anon key 是公开密钥，设计上会暴露在前端。
