@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>基金净值管理系统 - 登录</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body class="auth-body">
+  <div class="auth-card">
+    <h1 class="auth-title">基金净值管理系统</h1>
+    <p class="auth-subtitle">请选择身份登录</p>
+
+    <div class="role-tabs">
+      <button class="role-tab active" data-role="user">用户登录</button>
+      <button class="role-tab" data-role="manager">经理登录</button>
+    </div>
+
+    <form id="loginForm" class="auth-form">
+      <label class="field">
+        <span>账号（邮箱）</span>
+        <input type="email" id="email" required autocomplete="username" placeholder="you@example.com" />
+      </label>
+      <label class="field">
+        <span>密码</span>
+        <input type="password" id="password" required autocomplete="current-password" placeholder="请输入密码" />
+      </label>
+      <p id="loginError" class="form-error" hidden></p>
+      <button type="submit" id="loginBtn" class="btn btn-primary btn-block">登 录</button>
+    </form>
+  </div>
+
+  <script type="module" src="./js/login.js"></script>
+</body>
+</html>

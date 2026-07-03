@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>基金管理 - 经理后台</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="brand">基金净值管理 · 经理后台</span>
+      <span id="managerName" class="muted"></span>
+    </div>
+    <button id="logoutBtn" class="btn btn-ghost">退出登录</button>
+  </header>
+
+  <main class="container">
+    <!-- 当日净值录入区 -->
+    <section class="card">
+      <h2 class="card-title">单股净值录入</h2>
+      <div class="nav-grid">
+        <label class="field">
+          <span>日期</span>
+          <input type="date" id="navDate" />
+        </label>
+        <div class="field read-field">
+          <span>初始仓位（只读）</span>
+          <div id="initialPosition" class="read-value">—</div>
+        </div>
+        <label class="field">
+          <span>当日仓位价值（元）</span>
+          <input type="number" id="positionValue" step="0.01" min="0" placeholder="如 1120000.00" />
+        </label>
+        <div class="field read-field">
+          <span>单股净值（自动计算）</span>
+          <div id="navValue" class="read-value nav-value">—</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="saveNavBtn" class="btn btn-primary">保存净值</button>
+        <span id="navMsg" class="inline-msg"></span>
+      </div>
+    </section>
+
+    <!-- 净值曲线（经理自查） -->
+    <section class="card">
+      <h2 class="card-title">净值变化曲线</h2>
+      <div class="chart-range">
+        <button class="range-btn" data-days="7">7日</button>
+        <button class="range-btn active" data-days="30">30日</button>
+        <button class="range-btn" data-days="90">90日</button>
+        <button class="range-btn" data-days="all">全部</button>
+      </div>
+      <div class="chart-wrap"><canvas id="navChart"></canvas></div>
+    </section>
+
+    <!-- 当日操作记录 -->
+    <section class="card">
+      <h2 class="card-title">当日操作记录</h2>
+      <p class="muted small">对应日期：<span id="txDateLabel">—</span>（无操作可不填）</p>
+
+      <div class="tx-form" id="txForm">
+        <div class="tx-row">
+          <input type="text" id="txCode" placeholder="股票代码" list="stockList" />
+          <datalist id="stockList"></datalist>
+          <input type="text" id="txName" placeholder="股票名称（自动带入，可手填）" />
+          <input type="number" id="buyPrice" step="0.001" min="0" placeholder="买入价" />
+          <input type="number" id="buyQty" step="1" min="1" placeholder="买入数量" />
+          <input type="number" id="sellPrice" step="0.001" min="0" placeholder="卖出价" />
+          <input type="number" id="sellQty" step="1" min="1" placeholder="卖出数量" />
+          <button id="addTxBtn" class="btn btn-secondary">添加</button>
+        </div>
+        <p id="txFormError" class="form-error" hidden></p>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr><th>股票代码</th><th>名称</th><th>买入价</th><th>买入量</th><th>卖出价</th><th>卖出量</th><th>操作</th></tr>
+        </thead>
+        <tbody id="txTableBody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- 初始仓位设置弹窗 -->
+  <div id="setupModal" class="modal" hidden>
+    <div class="modal-card">
+      <h3>设置初始仓位</h3>
+      <p class="muted small">首次使用，请录入基金成立时的总仓位价值（含现金与股票市值）。之后可在设置中修改。</p>
+      <label class="field">
+        <span>初始仓位价值（元）</span>
+        <input type="number" id="setupInitial" step="0.01" min="0.01" placeholder="如 1000000.00" />
+      </label>
+      <label class="field">
+        <span>起始日期</span>
+        <input type="date" id="setupDate" />
+      </label>
+      <p id="setupError" class="form-error" hidden></p>
+      <div class="actions">
+        <button id="setupSaveBtn" class="btn btn-primary">保存并开始</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./js/manager.js"></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>基金净值 - 用户查看</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="brand">基金净值走势</span>
+      <span id="userName" class="muted"></span>
+    </div>
+    <button id="logoutBtn" class="btn btn-ghost">退出登录</button>
+  </header>
+
+  <main class="container">
+    <!-- 最新净值卡片 -->
+    <section class="card nav-card">
+      <div class="nav-current">
+        <div class="nav-label">最新单股净值</div>
+        <div id="latestNav" class="nav-big">—</div>
+        <div id="latestChange" class="nav-change"></div>
+      </div>
+      <div class="nav-meta">
+        <div><span class="muted">日期：</span><span id="latestDate">—</span></div>
+        <div><span class="muted">初始仓位：</span><span id="initPos">—</span></div>
+      </div>
+    </section>
+
+    <!-- 曲线图 -->
+    <section class="card">
+      <h2 class="card-title">净值变化曲线</h2>
+      <div class="chart-range">
+        <button class="range-btn" data-days="7">7日</button>
+        <button class="range-btn active" data-days="30">30日</button>
+        <button class="range-btn" data-days="90">90日</button>
+        <button class="range-btn" data-days="all">全部</button>
+      </div>
+      <div class="chart-wrap"><canvas id="navChart"></canvas></div>
+    </section>
+
+    <!-- 历史净值明细 -->
+    <section class="card">
+      <h2 class="card-title">历史净值明细</h2>
+      <table class="data-table">
+        <thead><tr><th>日期</th><th>仓位价值</th><th>单股净值</th><th>涨跌幅</th></tr></thead>
+        <tbody id="navTableBody"></tbody>
+      </table>
+    </section>
+
+    <!-- 当日操作明细 -->
+    <section class="card">
+      <h2 class="card-title">每日操作明细</h2>
+      <div id="txGrouped"></div>
+    </section>
+  </main>
+
+  <script type="module" src="./js/user.js"></script>
+</body>
+</html>
